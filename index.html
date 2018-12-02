@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    		<meta charset="UTF-8">
+    		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+		<title>Simple Counter</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+
+  	<body>
+  		<div>
+  			<p id="counter-value"></p>
+  			<button id="increment">Increament</button>
+  			<button id="decrement">Decreament</button>
+  			<button id="reset">Reset</button>
+  		</div>
+
+  		<script src='https://code.jquery.com/jquery-3.2.1.slim.js' crossorigin="anonymous" ></script>
+  		<script src = './web3.min.js'></script>
+
+  		<script>
+  			var contract;
+
+  			$(document).ready(function() {
+  				initContract();
+  				getValue();
+  			})
+
+  			function initContract() {
+  				web3 = new Web3(web3.currentProvider);
+  				var address = "0x135b625cf552c622dbb264997ceb65d28d5f85c2";
+  				var abi = [
+					{
+						"constant": false,
+						"inputs": [],
+						"name": "decreament",
+						"outputs": [],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "function"
+					},
+					{
+						"constant": false,
+						"inputs": [],
+						"name": "increament",
+						"outputs": [],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "function"
+					},
+					{
+						"constant": false,
+						"inputs": [],
+						"name": "reset",
+						"outputs": [],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "function"
+					},
+					{
+						"inputs": [],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "constructor"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "getCounter",
+						"outputs": [
+							{
+								"name": "",
+								"type": "int256"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					}
+				];
+
+				contract = new web3.eth.Contract(abi, address);
+				
+  			}
+
+  			function getValue() {
+					// .call() specifies that it just allows to read the state of method
+					contract.methods.getCounter().call().then(result=>{
+						$('#counter-value').html(result);
+					})
+			}
+
+
+
+  			$('#increment').click(function() {
+  				web3.eth.getAccounts().then(function(accounts){
+  					var acct = accounts[0];
+  					// .send()  who are we sending it from
+  					return contract.methods.increament().send({from:acct});
+  				})
+  				.then(function(tx){
+  					console.log("111111111111111111111",tx);
+  					var curr = parseInt($('#counter-value').html());
+  					$('counter-value').html(curr+1);
+  				})
+  				.catch(function(err){
+  					console.log("2222222222222222",err);
+  				})
+  			})
+
+  			$('#decrement').click(function(){
+  				web3.eth.getAccounts().then(function(accounts){
+  					var acct = accounts[0];
+  					return contract.methods.decreament().send({from:acct});
+  				})
+  				.then(function(tx){
+  					console.log("111111111111111111111",tx);
+  					var curr = parseInt($('#counter-value').html());
+  					$('counter-value').html(curr-1);
+  				})
+  				.catch(function(err){
+  					console.log("2222222222222222",err);
+  				})
+  			})
+
+  			$('#reset').click(function() {
+  				web3.eth.getAccounts().then(function(accounts){
+  					var acct = accounts[0];
+  					// .send()  who are we sending it from
+  					return contract.methods.reset().send({from:acct});
+  				})
+  				.then(function(tx){
+  					console.log("111111111111111111111",tx);
+  					var curr = parseInt($('#counter-value').html());
+  					$('counter-value').html(0);
+  				})
+  				.catch(function(err){
+  					console.log("2222222222222222",err);
+  				})
+  			})
+
+  		</script>
+  	</body>
+</html>
